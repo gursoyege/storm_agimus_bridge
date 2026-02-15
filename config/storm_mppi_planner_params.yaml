@@ -1,0 +1,29 @@
+storm_mppi_planner:
+  ros__parameters:
+    # Inputs
+    goal_topic: /goal_pose
+    objects_markers_topic: /storm_pick_place/objects_markers
+    ignore_collision_namespaces: ["pp_pick_object", "pp_place_target"]
+
+    # Frames 
+    base_frame_name: fer_link0
+    ee_frame_name: fer_hand_tcp
+
+    # MPPI rate
+    rate_hz: 50.0
+
+    # STORM configs (resolved relative to /workspace/storm)
+    storm_robot: franka
+    storm_world: collision_table.yml
+
+    # STORM MPPI task config (under storm/content/configs/mpc)
+    storm_task_file: franka_reacher.yml
+
+    # Torch device for STORM MPPI ("cpu", "cuda:0)
+    mppi_device: cuda:0
+
+    # LFC gains linear_feedback_controller_msgs/Control
+    kp: [60.0]
+    kd: [5.0]
+    feedforward_mode: inverse_dynamics  # none | gravity | inverse_dynamics
+    disarmed_behavior: hold  # hold | zero_torque
