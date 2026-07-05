@@ -3,7 +3,20 @@ storm_mppi_planner:
     # Inputs
     goal_topic: /goal_pose
     objects_markers_topic: /storm_pick_place/objects_markers
-    ignore_collision_namespaces: ["pp_pick_object", "pp_place_target"]
+    include_objects_markers_in_collision: true
+    collision_markers_topic: ""
+    auto_discover_collision_markers_topic: true
+    collision_markers_topic_hint: collision_markers
+    collision_poses_topic: ""
+    collision_pose_radius: 0.05
+    collision_pose_namespace: rtcosmik_collision_pose
+    refresh_collision_world_on_updates: true
+    collision_update_rate_hz: 30.0
+    dynamic_collision_mode: true
+    dynamic_collision_slots: 0
+    dynamic_cylinder_spheres_per_object: 5
+    use_base_world_collision: true
+    ignore_collision_namespaces: ["pp_pick_object", "pp_place_target"] #pp_barrier
 
     # Frames 
     base_frame_name: fer_link0
@@ -11,19 +24,26 @@ storm_mppi_planner:
 
     # MPPI rate
     rate_hz: 50.0
+    debug_mppi_rate: true
+    debug_collision_objects: false
+    debug_collision_objects_max_items: 12
 
     # STORM configs (resolved relative to /workspace/storm)
     storm_robot: franka
-    storm_world: collision_table.yml
-
-    # STORM MPPI task config (under storm/content/configs/mpc)
+    storm_world: collision_primitives_3d.yml
     storm_task_file: franka_reacher.yml
 
-    # Torch device for STORM MPPI ("cpu", "cuda:0)
     mppi_device: cuda:0
-
-    # LFC gains linear_feedback_controller_msgs/Control
-    kp: [60.0]
-    kd: [5.0]
-    feedforward_mode: inverse_dynamics  # none | gravity | inverse_dynamics
+    gain_joint_names: [fer_joint1, fer_joint2, fer_joint3, fer_joint4, fer_joint5, fer_joint6, fer_joint7]
+    kp: [100.0, 100.0, 100.0, 100.0, 100.0, 100.0, 100.0]
+    kd: [10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0]
+    feedforward_mode: inverse_dynamics  # none | gravity | coriolis_gravity | inverse_dynamics
+    feedforward_accel_filter_coeff: 1.0
+    enable_reference_smoothing: true
+    ref_smoothing_rate_hz: 1000.0   # how fast the OTG publishes between STORM replans
+    ref_smoothing_max_vel: [2.0]    # rad/s, length 1 or 7
+    ref_smoothing_max_acc: [8.0]    # rad/s^2
+    ref_smoothing_max_jerk: [1000.0]   # rad/s^3
+    # (feedback_mode: cartesian) and (enable_reference_smoothing) exist as options but are NOT the recommended default.
     disarmed_behavior: hold  # hold | zero_torque
+    sync_init_state_with_sensor: true
